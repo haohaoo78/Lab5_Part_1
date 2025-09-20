@@ -1,41 +1,55 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+// app.js
+require('dotenv').config(); // load .env
+const express = require('express');
+const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const cookieParser = require('cookie-parser');
+const methodOverride = require('method-override');
+const path = require('path');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const app = express();
 
-var app = express();
+// ===== Routes =====
+const renderRoutes = require('./routes/renderRoutes'); // routes chính
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-
-app.use(logger('dev'));
+// ===== Middleware =====
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// method-override để xử lý PUT/DELETE trong form HTML
+app.use(methodOverride('_method'));
+
 app.use(express.static(path.join(__dirname, 'public')));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views')); // folder views
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// ===== MongoDB =====
+mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/mvcApp', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('✅ MongoDB connected'))
+.catch(err => console.error('❌ MongoDB connection error:', err));
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+// ===== Session =====
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'mysecretkey',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/mvcApp',
+    collectionName: 'sessions'
+  }),
+  cookie: { httpOnly: true, maxAge: 1000 * 60 * 60 } // 1 giờ
+}));
+
+// ===== Use routes =====
+app.use('/', renderRoutes); // tất cả route đều qua renderRoutes
+
+// ===== Start server =====
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-
-module.exports = app;
