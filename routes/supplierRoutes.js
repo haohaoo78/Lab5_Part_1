@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const ctrl = require("../controllers/renderController");
 
+router.get("/", ctrl.renderSuppliers);           // Trang danh sách nhà cung cấp
+router.get("/new", ctrl.renderNewSupplier);      // Trang thêm mới nhà cung cấp
+router.get("/:id/edit", ctrl.renderEditSupplier); // Trang sửa nhà cung cấp
+
 /**
  * @swagger
  * tags:

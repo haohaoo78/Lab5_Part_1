@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const ctrl = require("../controllers/renderController");
 
+router.get("/", ctrl.renderProducts);          // Trang danh sách sản phẩm
+router.get("/new", ctrl.renderNewProduct);     // Trang thêm mới sản phẩm
+router.get("/:id/edit", ctrl.renderEditProduct); // Trang sửa sản phẩm
+
 /**
  * @swagger
  * tags:
@@ -100,5 +104,6 @@ router.put("/:id", ctrl.updateProduct);
  *         description: Sản phẩm đã bị xóa
  */
 router.delete("/:id", ctrl.deleteProduct);
+
 
 module.exports = router;
