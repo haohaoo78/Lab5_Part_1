@@ -1,6 +1,5 @@
 # Node modules
 node_modules/
-# npm install express 
 
 # Environment variables
 .env
