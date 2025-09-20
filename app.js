@@ -1,17 +1,14 @@
 // app.js
-require('dotenv').config(); // load .env
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
-const cookieParser = require('cookie-parser');
 const methodOverride = require('method-override');
 const path = require('path');
 
 const app = express();
 
 // ===== Controllers =====
-const ctrl = require('./controllers/renderController'); // để xử lý dashboard
+const ctrl = require('./controllers/renderController');
 
 // ===== Routes =====
 const supplierRoutes = require('./routes/supplierRoutes');
@@ -20,37 +17,22 @@ const productRoutes = require('./routes/productRoutes');
 // ===== Middleware =====
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-// method-override để xử lý PUT/DELETE trong form HTML
 app.use(methodOverride('_method'));
-
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views')); // folder views
+app.set('views', path.join(__dirname, 'views'));
 
 // ===== MongoDB =====
-mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/mvcApp', {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
 .then(() => console.log('✅ MongoDB connected'))
 .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// ===== Session =====
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'mysecretkey',
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/mvcApp',
-    collectionName: 'sessions'
-  }),
-  cookie: { httpOnly: true, maxAge: 1000 * 60 * 60 } // 1 giờ
-}));
-
-// ===== Use routes =====
-app.get("/", ctrl.renderDashboard);  // Dashboard
+// ===== Routes =====
+app.get("/", ctrl.renderDashboard);
 app.use("/suppliers", supplierRoutes);
 app.use("/products", productRoutes);
 
