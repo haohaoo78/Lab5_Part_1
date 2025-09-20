@@ -35,16 +35,15 @@ env:
 PORT=3000
 MONGO_URI=mongodb://127.0.0.1:27017/mvcApp
 SESSION_SECRET=your_secret_key
-⚠️ .env đã được ignore trong .gitignore, không push lên GitHub.
+->>>.env đã được ignore trong .gitignore, không push lên GitHub.
 
 
-▶️ Chạy ứng dụng
-
+Chạy ứng dụng
 npm start
 Truy cập tại: http://localhost:3000
 
-📂 Cấu trúc thư mục
 
+Cấu trúc thư mục
 project/
 │-- app.js
 │-- package.json
