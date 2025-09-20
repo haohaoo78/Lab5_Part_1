@@ -10,8 +10,12 @@ const path = require('path');
 
 const app = express();
 
+// ===== Controllers =====
+const ctrl = require('./controllers/renderController'); // để xử lý dashboard
+
 // ===== Routes =====
-const renderRoutes = require('./routes/renderRoutes'); // routes chính
+const supplierRoutes = require('./routes/supplierRoutes');
+const productRoutes = require('./routes/productRoutes');
 
 // ===== Middleware =====
 app.use(express.json());
@@ -46,7 +50,9 @@ app.use(session({
 }));
 
 // ===== Use routes =====
-app.use('/', renderRoutes); // tất cả route đều qua renderRoutes
+app.get("/", ctrl.renderDashboard);  // Dashboard
+app.use("/suppliers", supplierRoutes);
+app.use("/products", productRoutes);
 
 // ===== Start server =====
 const PORT = process.env.PORT || 3000;
